@@ -1,0 +1,24 @@
+{
+    "version": "0",
+    "id": "6ae925c4-57e3-fa46-89c6-bb2d183ed0c5",
+    "detail-type": "v1.customer.subscription.created",
+    "source": "aws.partner/stripe.com/ed_test_CHP0hXonfX2FV4UTNQjZ94AJkwYBx8lTCHP0hXonfX2F",
+    "account": "123456789012",
+    "time": "2026-10-28T16:19:20Z",
+    "region": "us-east-2",
+    "resources": [
+        "arn:aws:events:us-east-2::event-source/aws.partner/stripe.com/ed_test_CHP0hXonfX2FV4UTNQjZ94AJkwYBx8lTCHP0hXonfX2F"
+    ],
+    "detail": {
+        "id": "evt_test_O6XSTnpPrfvXnbV5IL5srGsQlUbniz01O6XSTnpPrfvXnb",
+        "object": "v2.core.event",
+        "type": "v1.customer.subscription.created",
+        "livemode": false,
+        "created": "2026-10-28T16:19:19.705Z",
+        "related_object": {
+            "id": "sub_DVUxgGKVu0IaokrJwjC5pXKi",
+            "type": "subscription",
+            "url": "/v1/subscriptions/sub_DVUxgGKVu0IaokrJwjC5pXKi"
+        }
+    }
+}

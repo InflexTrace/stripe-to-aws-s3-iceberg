@@ -1,0 +1,28 @@
+# Local stand-in for S3 Tables: Iceberg REST catalog backed by an S3 mock (used by the tests, see conftest.py)
+#
+# Both services keep their state on tmpfs (in-memory, dropped when the container stops), so the catalog and the
+# S3 store reset together.
+services:
+  s3:
+    image: adobe/s3mock:latest
+    ports: ["9090:9090"]
+    volumes:  #
+      - {type: tmpfs, target: /s3data, tmpfs: {mode: 0o1777}}
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: warehouse
+      COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /s3data
+  rest:
+    image: apache/iceberg-rest-fixture:latest
+    ports: ["8181:8181"]
+    depends_on: [s3]
+    volumes:
+      - {type: tmpfs, target: /catalog, tmpfs: {mode: 0o1777}}
+    environment:
+      AWS_ACCESS_KEY_ID: admin
+      AWS_SECRET_ACCESS_KEY: password
+      AWS_REGION: us-east-2
+      CATALOG_URI: jdbc:sqlite:/catalog/iceberg_catalog.db
+      CATALOG_WAREHOUSE: s3://warehouse/
+      CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
+      CATALOG_S3_ENDPOINT: http://s3:9090
+      CATALOG_S3_PATH__STYLE__ACCESS: "true"

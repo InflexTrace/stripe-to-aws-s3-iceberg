@@ -1,0 +1,25 @@
+# Python dependencies of the Lambdas. Each group except dev is one Lambda layer: ../layers/build.sh installs it
+# from uv.lock into .build/layers/<group> (layer list in ../main.tf, local.pip_layers). dev is the local env (tests, IDE).
+[project]
+name = "stripe-iceberg-lambdas"
+version = "0.1.0"
+requires-python = ">=3.14" # lambda_runtime in ../main.tf
+
+[dependency-groups]
+duckdb = ["duckdb==2.0.0"]
+stripe = ["stripe==16.0.0"]
+dev = [
+    { include-group = "duckdb" },
+    { include-group = "stripe" },
+    "boto3", # preinstalled in the Lambda python runtime, so it has no layer
+    "pytest",
+]
+
+[tool.uv]
+package = false # just a set of scripts, nothing to build or install
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."] # handlers import `common.*`, as they do from the root of the Lambda zip
+# An exception in a raw threading.Thread never reaches the test (join() doesn't re-raise); fail instead of just warning
+filterwarnings = ["error::pytest.PytestUnhandledThreadExceptionWarning"]

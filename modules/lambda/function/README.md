@@ -1,0 +1,2 @@
+# Simple AWS Lambda module
+
