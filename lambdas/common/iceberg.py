@@ -77,7 +77,6 @@ def target_table(table: str) -> str:
 def create_table_if_not_exists(conn: duckdb.DuckDBPyConnection, table: str, schema: dict[str, str]) -> None:
     fields = "\n".join(f"   {field} {field_type}," for field, field_type in schema.items())
 
-    # PARTITIONED BY (bucket(16, {iceberg_schema['created_at']}))
     DDL = f"""
     CREATE TABLE IF NOT EXISTS {target_table(table)} (
         {fields}
