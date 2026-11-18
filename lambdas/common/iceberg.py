@@ -153,8 +153,9 @@ def build_merge(target: str, schema: dict[str, str], pk: str, extra_upsert_condi
     """
 
 
-# Applied by the MERGE too, as a safety net: within one transaction it sees the same snapshot as classify(), so it never
-# rejects a row classify() let through (unless the lambdas' clocks are skewed)
+# Only overwrite a stored row when our read is provably newer: it started after the stored read finished.
+# Used by classify() to pick 'update', and by the MERGE (same snapshot within one transaction, so it never rejects a row
+# classify() let through unless lambda clocks are skewed)
 UPDATE_GUARD = "source._requested_at >= target._received_at"
 
 
@@ -190,12 +191,12 @@ def classify(conn: duckdb.DuckDBPyConnection, table: str, pk: str, pk_type: str,
     return dict(conn.execute(f"""
         SELECT source.k,
             CASE
-                WHEN target.{pk} IS NULL                THEN 'insert'
-                WHEN source.req >= target._received_at  THEN 'update'
-                WHEN source.rec <= target._requested_at THEN 'drop'
+                WHEN target.{pk} IS NULL                         THEN 'insert'
+                WHEN {UPDATE_GUARD}                              THEN 'update'
+                WHEN source._received_at <= target._requested_at THEN 'drop'
                 ELSE 'refetch'
             END
-        FROM (SELECT s.k::{pk_type} AS k, s.req::TIMESTAMPTZ AS req, s.rec::TIMESTAMPTZ AS rec
+        FROM (SELECT s.k::{pk_type} AS k, s.req::TIMESTAMPTZ AS _requested_at, s.rec::TIMESTAMPTZ AS _received_at
               FROM (SELECT unnest($1) AS s)) AS source
         LEFT JOIN {target_table(table)} AS target ON target.{pk} = source.k
     """, [windows]).fetchall())
