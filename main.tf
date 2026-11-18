@@ -130,7 +130,7 @@ resource "aws_cloudwatch_event_target" "sqs_target" {
 
 ########### Stripe events queue ##########################
 # EventBridge -> SQS -> stripe_events_lambda in batches, so one invocation upserts many subscriptions in one Iceberg
-# commit (commits conflict table-wide), with a bounded number of concurrent writers and a DLQ for failing events
+# commit, with a bounded number of concurrent writers and a DLQ for failing events
 
 locals {
   stripe_events_lambda_timeout_seconds = 300

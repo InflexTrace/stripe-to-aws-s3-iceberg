@@ -31,9 +31,9 @@ def test_001_provably_older_stale_overwrite(mock_event_lambda_stripe_lookup, moc
     real_upsert = reconciliation_lambda_module.upsert
 
     event_lambda_completed = threading.Event()
-    def waiting_upsert(conn, table, objects, extra_upsert_conditions):
+    def waiting_upsert(conn, table, objects, refetch):
         assert event_lambda_completed.wait(timeout=10), "Reconciliation lambda waited for stripe event lambda and timed out"
-        return real_upsert(conn, table, objects, extra_upsert_conditions)
+        return real_upsert(conn, table, objects, refetch)
 
     monkeypatch.setattr(reconciliation_lambda_module, "upsert", waiting_upsert)
 
