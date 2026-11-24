@@ -281,10 +281,10 @@ module "reconciliation_lambda" {
   layers               = local.lambda_layers
   additional_dirs      = local.lambda_additional_dirs
 
-  # Load test: 1024 MB peaked at 1010-1023 MB with 20-40k rows and stalled a MERGE at 40k (timeout). Each batch joins
-  # against the whole table, so memory grows with it; more memory is also more vCPU (MERGE is CPU-bound).
-  # 3008 = this account's current Lambda memory limit (UpdateFunctionConfiguration rejects more; quota increase needed)
-  memory_size_mb  = 3008
+  # Each batch joins against the whole table, so memory grows with it; more memory is also more vCPU (~2.3 at 4096 MB).
+  # Load test (lambdas/stress_test): peaked at 1722 MB with 50k subscriptions. New AWS accounts may cap Lambda memory
+  # at 3008 MB until a quota increase.
+  memory_size_mb  = 4096
   timeout_seconds = 900 # Lambda maximum (15 minutes)
 
   schedule_expression = {
