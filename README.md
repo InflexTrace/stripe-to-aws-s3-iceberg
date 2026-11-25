@@ -1,6 +1,13 @@
 # stripe-to-aws-s3-iceberg
 Stripe subscriptions synced into Apache Iceberg on S3, with concurrency-safe upserts from AWS Lambda and DuckDB.
 
+> [!TIP]
+> 📖 **Read the article:
+> [DuckDB in Lambda as an Iceberg writer: Stripe to S3 Tables for under $5 a month](https://inflextrace.com/blog/stripe-to-aws-s3-iceberg)**
+>
+> The story behind this repo: why thin events, how stale writes and Iceberg commit conflicts are handled, and how it
+> held up in a 50k-subscription load test. *11 min read*
+
 ## How it works
 
 ```
